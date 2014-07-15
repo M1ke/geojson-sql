@@ -112,7 +112,7 @@ class SqlGeo {
 
 	function search_kml(Array $where){
 		$rows=$this->get_rows($where);
-		return $this->output_json($rows);
+		return $this->output_kml($rows);
 	}
 
 	function kml_polygon($record){
