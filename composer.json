@@ -1,5 +1,5 @@
 {
-    "name": "m1ke/geojson-sql",
+    "name": "m1ke/sql-geo",
     "description": "Easily store GeoJSON in a SQL database",
     "license": "MIT",
     "require": {
