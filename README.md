@@ -6,6 +6,10 @@ A PHP library for saving data from a GeoJSON file to an SQl database using PDO.
 
 `php composer.phar require m1ke/geojson-sql`
 
+### Authors
+
+Written by [Mike Lehan](http://twitter.com/m1ke) and [StuRents.com](http://sturents.com).
+
 ### Usage
 
 * `process_and_save()` Returns the `$polygon` array formatted for inclusion in a query. Also accepts a PDO statement if you want to save in a database.
