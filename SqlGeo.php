@@ -5,8 +5,16 @@ class SqlGeo {
 	protected $table;
 	protected $field_polygon;
 
-	function __construct(PDO $db){
+	function __construct(PDO $db=null,$table='',$field=''){
+		$this->set_db($db);
+		$this->set_table($table);
+		$this->set_field($field);
+		return $this;
+	}
+
+	function set_db($db){
 		$this->db=$db;
+		return $this;
 	}
 
 	function set_table($table){
@@ -20,13 +28,18 @@ class SqlGeo {
 	}
 
 	function get_rows(Array $where){
+		if (!$this->db){
+			throw new Exception('You must setup a database connection to get rows.');
+		}
+		if (empty($this->table)){
+			throw new Exception('You must set a database table name to get rows.');
+		}
 		foreach ($where as $key => $val){
 			$where_prepare[]="$key = :$key";
 			$where_data[':'.$key]=$val;
 		}
 		$select=$this->sql_select();
-		$query="SELECT *,$select FROM {$this->table} WHERE ".implode(' and ',$where);
-		$query=$this->prepare($query);
+		$query=$this->db->prepare("SELECT *,$select FROM {$this->table}".(!empty($where)? " WHERE ".implode(' and ',$where) : "LIMIT 10"));
 		$query->execute($where_data);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
