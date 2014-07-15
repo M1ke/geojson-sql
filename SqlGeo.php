@@ -91,7 +91,7 @@ class SqlGeo {
 				]
 			]
 		];
-		$structure['geometry']['coordinates'][0]=$this->record_polygon($record,false);
+		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
 		unset($record[$this->field_polygon]);
 
 		foreach ($record as $field => $val){
@@ -116,7 +116,7 @@ class SqlGeo {
 	}
 
 	function kml_polygon($record){
-		$coordinates=$this->record_polygon($record);
+		$coordinates=$this->record_polygon($record,false);
 		$coordinates=implode("\n\r\t\t\t\t\t\t",$coordinates);
 		$polygon="
 			<Polygon>
