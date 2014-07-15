@@ -1,6 +1,8 @@
-# GeoJSON to SQL
+# SQL Geo I/O
 
-A PHP library for saving data from a GeoJSON file to an SQl database using PDO.
+A PHP library for moving data between database and standard output formats (e.g. `GeoJSON` and `KML`).
+
+Initially created just as a wrapper to take GeoJSON data and input into a database.
 
 ### Installation
 
