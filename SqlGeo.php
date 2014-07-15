@@ -71,6 +71,10 @@ class SqlGeo {
 		return $polygon;
 	}
 
+	protected function record_polygon($record){
+		return $this->polygon_to_array($record[$this->field_polygon]);
+	}
+
 	function geo_json($record){
 		$arr=$this->geo_json_structure($record);
 		return json_encode($arr);
@@ -87,12 +91,59 @@ class SqlGeo {
 				]
 			]
 		];
-		$structure['geometry']['coordinates'][0]=$this->polygon_to_array($record[$this->field_polygon]);
+		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
 		unset($record[$this->field_polygon]);
 
 		foreach ($record as $field => $val){
 			$structure['properties'][$field]=$val;
 		}
 		return $structure;
+	}
+
+	function output_kml($rows,$name=''){
+		foreach ($rows as $row){
+			if (empty($name)){
+				$name=$row['name'];
+			}
+			$polygons[]=kml_polygon($row);
+		}
+		return kml_structure($polygons,$name);
+	}
+
+	function search_kml(Array $where){
+		$rows=$this->get_rows($where);
+		return $this->output_json($rows);
+	}
+
+	function kml_polygon($record){
+		$coordinates=$this->record_polygon($record);
+		$coordinates=implode("\n\r\t\t\t\t\t\t",$coordinates);
+		$polygon="
+			<Polygon>
+				<outerBoundaryIs>
+					<LinearRing>
+						<coordinates>
+							$coordinates
+						</coordinates>
+					</LinearRing>
+				</outerBoundaryIs>
+			</Polygon>";
+		return $polygon;
+	}
+
+	function kml_structure($polygons,$name){
+		$polygons=implode("\n",$polygons);
+	$kml = <<< END
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+	<Placemark>
+		<name>$name</name>
+		<MultiGeometry>
+$polygons
+		</MultiGeometry>
+	</Placemark>
+</kml>
+END;
+		return $kml;
 	}
 }
