@@ -107,7 +107,7 @@ class SqlGeo {
 			}
 			$polygons[]=$this->kml_polygon($row);
 		}
-		return this->kml_structure($polygons,$name);
+		return $this->kml_structure($polygons,$name);
 	}
 
 	function search_kml(Array $where){
