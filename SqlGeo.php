@@ -102,8 +102,9 @@ class SqlGeo {
 
 	function output_kml($rows,$name=''){
 		foreach ($rows as $row){
-			if (empty($name)){
-				$name=$row['name'];
+			if (isset($row[$name]) and !$name_set){
+				$name=$row[$name];
+				$name_set=true;
 			}
 			$polygons[]=$this->kml_polygon($row);
 		}
