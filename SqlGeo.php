@@ -66,7 +66,7 @@ class SqlGeo {
 		$polygon=explode(',',$polygon);
 		foreach ($polygon as &$coords){
 			$coords=explode(' ',$coords);
-			$coords=[$coords[1],$coords[0]];
+			$coords=$coords[1].','.$coords[0];
 		}
 		return $polygon;
 	}
