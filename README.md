@@ -22,7 +22,7 @@ Written by [Mike Lehan](http://twitter.com/m1ke) and [StuRents.com](http://sture
 
 ### Example
 
-For GeoJsonSQl:
+For GeoJsonSql:
 
     require __DIR__.'/vendor/autoload.php';
 
