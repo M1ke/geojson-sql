@@ -14,7 +14,7 @@ class GeoJsonSql {
 		}
 	}
 
-	function process_coordinates(){
+	protected function process_coordinates(){
 		$geometry=$this->data['geometry']['coordinates'][0];
 		$coordinates=[];
 		foreach ($geometry as $coords){
@@ -32,36 +32,53 @@ class GeoJsonSql {
 		return $coordinates;
 	}
 
-	function sql_field_polygon($coordinates){
+	protected function sql_field_polygon($coordinates){
 		$polygon=implode(',',$coordinates);
 		$polygon="POLYGON( ($polygon) )";
+		return $polygon;
 	}
 
 	function sql_query_polygon(PDO $db,$table,$name){
 		return $db->prepare("INSERT INTO `$table` (`$name`) VALUES (PolyFromText( :polygon ))");
 	}
 
-	function process_and_save(PDOStatement $query=null){
+	function process_coordinates_sql(){
 		$coordinates=$this->process_coordinates();
+		return $this->sql_field_polygon($coordinates);
+	}
 
-		$polygon=$this->sql_field_polygon($coordinates);
-
-		if (isset($query)){
-			if (!$query->execute([
-				':polygon'=>$polygon,
-				':name'=>$data['properties']['NAME'],
-				':desc1'=>$data['properties']['DESCRIPT0'],
-				':desc2'=>$data['properties']['DESCRIPTIO'],
-				':file'=>$data['properties']['FILE_NAME'],
-			])){
-				throw new Exception('Database error: '.print_r($query->errorInfo(),true));
-			}
+	protected function properties_as_input(Array $input){
+		$properties=$this->data['properties'];
+		foreach ($input as $key => $field){
+			$property=!isset($properties[$field]) ? strtoupper($field) : $field;
+			$output[$key]=isset($properties[$property]) ? $properties[$property] : $field;
 		}
-		return $polygon;
+		return $output;
+	}
+
+	function process_and_save(PDOStatement $query,Array $input=[]){
+		$polygon=$this->process_coordinates_sql();
+		if (!empty($input)){
+			$input=$this->properties_as_input($input);
+		}
+
+		$input=array_merge($input,[
+			':polygon'=>$polygon,
+		]);
+		if (!$query->execute($input)){
+			throw new Exception('Database error: '.print_r($query->errorInfo(),true));
+		}
+		return true;
 	}
 
 	function process_with_query(PDO $db,$table,$name){
 		$query=$this->sql_query_polygon($db,$table,$name);
-		return $this->process_and_save($query);
+		$this->process_and_save($query);
+		return true;
+	}
+
+	function list_properties($output=true){
+		$keys=array_keys($this->data['properties']);
+		return print_r($keys,!$output);
 	}
 }
