@@ -1,0 +1,11 @@
+{
+    "name": "m1ke/geojson-sql",
+    "description": "Easily store GeoJSON in a SQL database",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "classmap": ["GeoJsonSql.php"]
+    }
+}
