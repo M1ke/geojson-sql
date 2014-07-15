@@ -39,7 +39,8 @@ class SqlGeo {
 			$where_data[':'.$key]=$val;
 		}
 		$select=$this->sql_select();
-		$query=$this->db->prepare("SELECT *,$select FROM {$this->table}".(!empty($where)? " WHERE ".implode(' and ',$where) : "LIMIT 10"));
+		$query="SELECT *,$select FROM {$this->table}".(!empty($where_prepare)? " WHERE ".implode(' and ',$where_prepare) : " LIMIT 10");
+		$query=$this->db->prepare($query);
 		$query->execute($where_data);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -52,11 +53,11 @@ class SqlGeo {
 		foreach ($rows as $row){
 			$json[]=$this->geo_json_structure($row);
 		}
-		return json_encode($json);
+		return json_encode(count($json)>1 ? $json : $json[0],JSON_PRETTY_PRINT);
 	}
 
 	function search_json(Array $where){
-		$rows=$this->get_rows(Array $where);
+		$rows=$this->get_rows($where);
 		return $this->output_json($rows);
 	}
 
