@@ -61,18 +61,18 @@ class SqlGeo {
 		return $this->output_json($rows);
 	}
 
-	protected function polygon_to_array($polygon){
+	protected function polygon_to_array($polygon,$arr=true){
 		$polygon=str_replace(['POLYGON','(',')'],'',$polygon);
 		$polygon=explode(',',$polygon);
 		foreach ($polygon as &$coords){
 			$coords=explode(' ',$coords);
-			$coords=$coords[1].','.$coords[0];
+			$coords=$arr ? [$coords[1],$coords[0]] : $coords[1].','.$coords[0];
 		}
 		return $polygon;
 	}
 
-	protected function record_polygon($record){
-		return $this->polygon_to_array($record[$this->field_polygon]);
+	protected function record_polygon($record,$arr=true){
+		return $this->polygon_to_array($record[$this->field_polygon],$arr);
 	}
 
 	function geo_json($record){
@@ -91,7 +91,7 @@ class SqlGeo {
 				]
 			]
 		];
-		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
+		$structure['geometry']['coordinates'][0]=$this->record_polygon($record,false);
 		unset($record[$this->field_polygon]);
 
 		foreach ($record as $field => $val){
