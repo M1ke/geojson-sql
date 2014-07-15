@@ -41,7 +41,7 @@ class GeoJsonSql {
 		return $db->prepare("INSERT INTO `$table` (`$name`) VALUES (PolyFromText( :polygon ))");
 	}
 
-	function process_and_save($query){
+	function process_and_save(PDOStatement $query=null){
 		$coordinates=$this->process_coordinates();
 
 		$polygon=$this->sql_field_polygon($coordinates);
