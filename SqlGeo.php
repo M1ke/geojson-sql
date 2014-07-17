@@ -123,11 +123,11 @@ class SqlGeo {
 	}
 
 	function geo_json_structure($record){
-		$structure=self::get_json_structure();
+		$structure=static::get_json_structure();
 		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
 		unset($record[$this->field_polygon]);
 
-		$ignore=self::get_ignored_properties();
+		$ignore=static::get_ignored_properties();
 		foreach ($record as $field => $val){
 			if (!isset($ignore[$field])){
 				$structure['properties'][$field]=$val;
