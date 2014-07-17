@@ -8,6 +8,8 @@ class SqlGeo {
 	protected $json;
 	protected $kml;
 
+	const INLINE = true;
+
 	function __construct(PDO $db=null,$table='',$field=''){
 		$this->set_db($db);
 		$this->set_table($table);
