@@ -51,7 +51,7 @@ class SqlGeo {
 			$where_prepare[]="$key = :$key";
 			$where_data[':'.$key]=$val;
 		}
-		$select=$this->sql_select();
+		$select=$this->sql_select_field();
 		$query="SELECT *,$select FROM {$this->table}".(!empty($where_prepare)? " WHERE ".implode(' and ',$where_prepare) : " LIMIT 10");
 		$query=$this->db->prepare($query);
 		$query->execute($where_data);
@@ -84,7 +84,7 @@ class SqlGeo {
 	}
 
 	function inline_json(){
-		return $this->_inline($this->json,'json');
+		return self::_inline($this->json,'json');
 	}
 
 	function search_json(Array $where,$inline=false){
@@ -105,7 +105,7 @@ class SqlGeo {
 		return json_encode($arr);
 	}
 
-	function get_json_structure(){
+	static public function get_json_structure(){
 		return [
 			'type'=>'Feature',
 			'properties'=>[],
@@ -118,13 +118,20 @@ class SqlGeo {
 		];
 	}
 
+	static public function get_ignored_properties(){
+		return [];
+	}
+
 	function geo_json_structure($record){
-		$structure=$this->get_json_structure();
+		$structure=self::get_json_structure();
 		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
 		unset($record[$this->field_polygon]);
 
+		$ignore=self::get_ignored_properties();
 		foreach ($record as $field => $val){
-			$structure['properties'][$field]=$val;
+			if (!isset($ignore[$field])){
+				$structure['properties'][$field]=$val;
+			}
 		}
 		return $structure;
 	}
@@ -134,7 +141,7 @@ class SqlGeo {
 	}
 
 	function inline_kml(){
-		return $this->_inline($this->kml,'vnd.google-earth.kml+xml');
+		return self::_inline($this->kml,'vnd.google-earth.kml+xml');
 	}
 
 	function search_kml(Array $where,$inline=false){
@@ -171,8 +178,12 @@ class SqlGeo {
 		return $polygon;
 	}
 
-	function sql_select(){
-		return "astext({$this->field_polygon}) as {$this->field_polygon}";
+	static private function sql_select($field){
+		return "astext({$field}) as {$field}";
+	}
+
+	private function sql_select_field(){
+		return self::sql_select($this->field_polygon);
 	}
 
 	function kml_structure($polygons,$name){
@@ -191,7 +202,7 @@ END;
 		return $kml;
 	}
 
-	private function _inline($content,$mime='json'){
+	static private function _inline($content,$mime='json'){
 		header('Content-type: application/'.$mime);
 		header('Content-Disposition: inline');
 		echo $content;
