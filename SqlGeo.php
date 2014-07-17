@@ -36,7 +36,11 @@ class SqlGeo {
 		return $this;
 	}
 
-	function get_rows(Array $where){
+	function get_rows(){
+		return $this->rows;
+	}
+
+	function db_search(Array $where){
 		if (!$this->db){
 			throw new Exception('You must setup a database connection to get rows.');
 		}
@@ -58,7 +62,7 @@ class SqlGeo {
 	private function search($type,Array $where,$inline=false){
 		$generate='generate_'.$type;
 		$return=$inline ? 'inline_'.$type : 'get_'.$type;
-		return $this->get_rows($where)->$generate()->$return();
+		return $this->db_search($where)->$generate()->$return();
 	}
 
 	protected function record_polygon($record,$arr=true){
