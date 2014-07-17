@@ -11,9 +11,11 @@ class SqlGeo {
 	const INLINE = true;
 
 	function __construct(PDO $db=null,$table='',$field=''){
-		$this->set_db($db);
-		$this->set_table($table);
-		$this->set_field($field);
+		if (!is_null($db)){
+			$this->set_db($db);
+			$this->set_table($table);
+			$this->set_field($field);
+		}
 		return $this;
 	}
 
@@ -33,6 +35,11 @@ class SqlGeo {
 
 	function set_field($field){
 		$this->field_polygon=$field;
+		return $this;
+	}
+
+	function set_rows($rows){
+		$this->rows=$rows;
 		return $this;
 	}
 
