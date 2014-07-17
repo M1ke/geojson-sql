@@ -17,7 +17,7 @@ class SqlGeo {
 		return $this;
 	}
 
-	function __call($name){
+	function __call($name,$args){
 		throw new Exception('There is no handler for the output type '.$name);
 	}
 
