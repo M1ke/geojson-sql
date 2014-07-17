@@ -105,8 +105,8 @@ class SqlGeo {
 		return json_encode($arr);
 	}
 
-	function geo_json_structure($record){
-		$structure=[
+	function get_json_structure(){
+		return [
 			'type'=>'Feature',
 			'properties'=>[],
 			'geometry'=>[
@@ -116,6 +116,10 @@ class SqlGeo {
 				]
 			]
 		];
+	}
+
+	function geo_json_structure($record){
+		$structure=$this->get_json_structure();
 		$structure['geometry']['coordinates'][0]=$this->record_polygon($record);
 		unset($record[$this->field_polygon]);
 
