@@ -48,8 +48,13 @@ class SqlGeo {
 			throw new Exception('You must set a database table name to get rows.');
 		}
 		foreach ($where as $key => $val){
-			$where_prepare[]="$key = :$key";
-			$where_data[':'.$key]=$val;
+			if (is_string($val)){
+				$where_prepare[]="$key = :$key";
+				$where_data[':'.$key]=$val;
+			}
+			else {
+				$where_prepare[]="$key <> ''";
+			}
 		}
 		$select=$this->sql_select_field();
 		$query="SELECT *,$select FROM {$this->table}".(!empty($where_prepare)? " WHERE ".implode(' and ',$where_prepare) : " LIMIT 10");
