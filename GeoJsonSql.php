@@ -51,7 +51,7 @@ class GeoJsonSql {
 	}
 
 	static final function sql_value_polygon($value){
-		return "PolyFromText($value)";
+		return "PolyFromText( $value )";
 	}
 
 	static function sql_query_polygon(PDO $db,$table,$name){
