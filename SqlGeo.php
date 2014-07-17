@@ -4,6 +4,9 @@ class SqlGeo {
 	protected $db;
 	protected $table;
 	protected $field_polygon;
+	protected $rows;
+	protected $json;
+	protected $kml;
 
 	function __construct(PDO $db=null,$table='',$field=''){
 		$this->set_db($db);
@@ -42,23 +45,40 @@ class SqlGeo {
 		$query="SELECT *,$select FROM {$this->table}".(!empty($where_prepare)? " WHERE ".implode(' and ',$where_prepare) : " LIMIT 10");
 		$query=$this->db->prepare($query);
 		$query->execute($where_data);
-		return $query->fetchAll(PDO::FETCH_ASSOC);
+		$this->rows=$query->fetchAll(PDO::FETCH_ASSOC);
+		return $this;
+	}
+
+	private function search($type,Array $where,$inline=false){
+		$generate='generate_'.$type;
+		$this->get_rows($where)->$generate();
+		$return=$inline ? 'inline_'.$type : 'get_'.$type;
+		return $this->$return();
 	}
 
 	function sql_select(){
 		return "astext({$this->field_polygon}) as {$this->field_polygon}";
 	}
 
-	function output_json(Array $rows){
+	function generate_json(){
+		$rows=$this->rows;
 		foreach ($rows as $row){
 			$json[]=$this->geo_json_structure($row);
 		}
-		return json_encode(count($json)>1 ? $json : $json[0],JSON_PRETTY_PRINT);
+		$this->json=json_encode(count($json)>1 ? $json : $json[0],JSON_PRETTY_PRINT);
+		return $this;
 	}
 
-	function search_json(Array $where){
-		$rows=$this->get_rows($where);
-		return $this->output_json($rows);
+	function get_json(){
+		return $this->json;
+	}
+
+	function inline_json(){
+		return $this->_inline($this->json,'json');
+	}
+
+	function search_json(Array $where,$inline=false){
+		return $this->search('json',$where,$inline);
 	}
 
 	protected function polygon_to_array($polygon,$arr=true){
@@ -100,7 +120,15 @@ class SqlGeo {
 		return $structure;
 	}
 
-	function output_kml($rows,$name=''){
+	function get_kml(){
+		return $this->kml;
+	}
+
+	function inline_kml(){
+		return $this->_inline($this->kml,'vnd.google-earth.kml+xml');
+	}
+
+	function generate_kml($rows,$name=''){
 		foreach ($rows as $row){
 			if (isset($row[$name]) and !$name_set){
 				$name=$row[$name];
@@ -108,12 +136,12 @@ class SqlGeo {
 			}
 			$polygons[]=$this->kml_polygon($row);
 		}
-		return $this->kml_structure($polygons,$name);
+		$this->kml=$this->kml_structure($polygons,$name);
+		return $this;
 	}
 
 	function search_kml(Array $where){
-		$rows=$this->get_rows($where);
-		return $this->output_kml($rows);
+		return $this->search('kml',$where);
 	}
 
 	function kml_polygon($record){
@@ -146,5 +174,12 @@ $polygons
 </kml>
 END;
 		return $kml;
+	}
+
+	private function _inline($content,$mime='json'){
+		header('Content-type: application/'.$mime);
+		header('Content-Disposition: inline');
+		echo $content;
+		return $this;
 	}
 }
