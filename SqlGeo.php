@@ -17,6 +17,10 @@ class SqlGeo {
 		return $this;
 	}
 
+	function __call($name){
+		throw new Exception('There is no handler for the output type '.$name);
+	}
+
 	function set_db($db){
 		$this->db=$db;
 		return $this;
