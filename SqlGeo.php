@@ -129,7 +129,7 @@ class SqlGeo {
 
 		$ignore=static::get_ignored_properties();
 		foreach ($record as $field => $val){
-			if (!isset($ignore[$field])){
+			if (!in_array($field,$ignore)){
 				$structure['properties'][$field]=$val;
 			}
 		}
