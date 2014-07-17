@@ -3,7 +3,13 @@
 class GeoJsonSql {
 	protected $data;
 
-	function __construct($file_name){
+	function __construct($file_name=''){
+		if (!empty($file_name)){
+			$this->load_file($file_name);
+		}
+	}
+
+	public function load_file($file_name){
 		$json=file_get_contents($file_name);
 		if (empty($json)){
 			throw new Exception('No file ('.$file_name.')');
@@ -12,10 +18,11 @@ class GeoJsonSql {
 		if (empty($this->data)){
 			throw new Exception('JSON could not be parsed ('.$file_name.')');
 		}
+		return $this;
 	}
 
-	protected function process_coordinates(){
-		$geometry=$this->data['geometry']['coordinates'][0];
+	static function process_coordinates($geometry,$switch=true){
+		$order=$switch ? [1,0] : [0,1];
 		$coordinates=[];
 		foreach ($geometry as $coords){
 			$safety=0;
@@ -24,7 +31,7 @@ class GeoJsonSql {
 				$coords=$coords[0];
 				$safety++;
 			}
-			$coordinates[]=$coords[1].' '.$coords[0];
+			$coordinates[]=$coords[$order[0]].' '.$coords[$order[1]];
 		}
 		if (!is_array($coordinates)){
 			return false;
@@ -32,19 +39,29 @@ class GeoJsonSql {
 		return $coordinates;
 	}
 
-	protected function sql_field_polygon($coordinates){
+	protected function coordinates_from_data(){
+		$geometry=$this->data['geometry']['coordinates'][0];
+		return static::process_coordinates($geometry);
+	}
+
+	static final function sql_field_polygon($coordinates){
 		$polygon=implode(',',$coordinates);
 		$polygon="POLYGON( ($polygon) )";
 		return $polygon;
 	}
 
-	function sql_query_polygon(PDO $db,$table,$name){
-		return $db->prepare("INSERT INTO `$table` (`$name`) VALUES (PolyFromText( :polygon ))");
+	static final function sql_value_polygon($value){
+		return "PolyFromText($value)";
 	}
 
-	function process_coordinates_sql(){
-		$coordinates=$this->process_coordinates();
-		return $this->sql_field_polygon($coordinates);
+	static function sql_query_polygon(PDO $db,$table,$name){
+		$values=self::sql_value_polygon(':polygon');
+		return $db->prepare("INSERT INTO `$table` (`$name`) VALUES ($values)");
+	}
+
+	function coordinates_from_data_sql(){
+		$coordinates=$this->coordinates_from_data();
+		return self::sql_field_polygon($coordinates);
 	}
 
 	protected function properties_as_input(Array $input){
@@ -57,7 +74,7 @@ class GeoJsonSql {
 	}
 
 	function process_and_save(PDOStatement $query,Array $input=[]){
-		$polygon=$this->process_coordinates_sql();
+		$polygon=$this->coordinates_from_data_sql();
 		if (!empty($input)){
 			$input=$this->properties_as_input($input);
 		}
@@ -72,7 +89,7 @@ class GeoJsonSql {
 	}
 
 	function process_with_query(PDO $db,$table,$name){
-		$query=$this->sql_query_polygon($db,$table,$name);
+		$query=static::sql_query_polygon($db,$table,$name);
 		$this->process_and_save($query);
 		return true;
 	}
