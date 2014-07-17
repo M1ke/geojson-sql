@@ -125,12 +125,13 @@ class SqlGeo {
 		return $this->_inline($this->kml,'vnd.google-earth.kml+xml');
 	}
 
-	function search_kml(Array $where){
-		return $this->search('kml',$where);
+	function search_kml(Array $where,$inline=false){
+		return $this->search('kml',$where,$inline);
 	}
 
 	function generate_kml($name=''){
 		$rows=$this->rows;
+		$polygons=[];
 		foreach ($rows as $row){
 			if (isset($row[$name]) and !$name_set){
 				$name=$row[$name];
