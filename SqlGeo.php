@@ -59,7 +59,7 @@ class SqlGeo {
 		return $this;
 	}
 
-	private function search($type,Array $where,$inline=false){
+	final protected function search($type,Array $where,$inline=false){
 		$generate='generate_'.$type;
 		$return=$inline ? 'inline_'.$type : 'get_'.$type;
 		return $this->db_search($where)->$generate()->$return();
@@ -178,11 +178,11 @@ class SqlGeo {
 		return $polygon;
 	}
 
-	static private function sql_select($field){
+	static final function sql_select($field){
 		return "astext({$field}) as {$field}";
 	}
 
-	private function sql_select_field(){
+	final protected function sql_select_field(){
 		return self::sql_select($this->field_polygon);
 	}
 
@@ -202,7 +202,7 @@ END;
 		return $kml;
 	}
 
-	static private function _inline($content,$mime='json'){
+	static final protected function _inline($content,$mime='json'){
 		header('Content-type: application/'.$mime);
 		header('Content-Disposition: inline');
 		echo $content;
