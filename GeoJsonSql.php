@@ -1,5 +1,4 @@
 <?php
-
 class GeoJsonSql {
 	protected $data;
 
