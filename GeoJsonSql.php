@@ -30,6 +30,9 @@ class GeoJsonSql {
 				$coords=$coords[0];
 				$safety++;
 			}
+			if (count($coords)<2){
+				continue;
+			}
 			$coordinates[]=$coords[$order[0]].' '.$coords[$order[1]];
 		}
 		if (!is_array($coordinates)){
