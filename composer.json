@@ -7,5 +7,10 @@
     },
     "autoload": {
         "classmap": ["GeoJsonSql.php","SqlGeo.php"]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "bash shell/setup"
+        ]
     }
 }

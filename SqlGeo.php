@@ -1,5 +1,4 @@
 <?php
-
 class SqlGeo {
 	protected $db;
 	protected $table;
@@ -125,8 +124,8 @@ class SqlGeo {
 				'type'=>'Polygon',
 				'coordinates'=>[
 					0=>[],
-				]
-			]
+				],
+			],
 		];
 	}
 

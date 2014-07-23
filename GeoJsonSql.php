@@ -45,6 +45,9 @@ class GeoJsonSql {
 	}
 
 	static final function sql_field_polygon($coordinates){
+		if (reset($coordinates)!=end($coordinates)){
+			$coordinates[]=reset($coordinates);
+		}
 		$polygon=implode(',',$coordinates);
 		$polygon="POLYGON( ($polygon) )";
 		return $polygon;
