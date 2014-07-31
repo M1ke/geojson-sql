@@ -94,6 +94,11 @@ class SqlGeo {
 		return $this->json;
 	}
 
+	function set_json($json){
+		$this->json=$json;
+		return $this;
+	}
+
 	function inline_json(){
 		return self::_inline($this->json,'json');
 	}
