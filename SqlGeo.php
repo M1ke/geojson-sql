@@ -151,6 +151,11 @@ class SqlGeo {
 		return $this->kml;
 	}
 
+	function set_kml($kml){
+		$this->kml=$kml;
+		return $this;
+	}
+
 	function inline_kml(){
 		return self::_inline($this->kml,'vnd.google-earth.kml+xml');
 	}
