@@ -6,6 +6,7 @@ class SqlGeo {
 	protected $rows;
 	protected $json;
 	protected $kml;
+	protected $style=['outline'=>1,'fill'=>1,'color'=>'ffffffff'];
 
 	const INLINE = true;
 
@@ -183,6 +184,13 @@ class SqlGeo {
 		return $this;
 	}
 
+	function set_style(Array $style){
+		foreach ($style as $key => $val){
+			$this->style[$key]=$val;
+		}
+		return $this;
+	}
+
 	function kml_polygon($record){
 		$coordinates=$this->record_polygon($record,false);
 		$coordinates=implode("\n\r\t\t\t\t\t\t",$coordinates);
@@ -214,6 +222,13 @@ class SqlGeo {
 <kml xmlns="http://www.opengis.net/kml/2.2">
 	<Placemark>
 		<name>$name</name>
+    	<Style>
+		    <PolyStyle>
+		      <color>{$this->style['color']}</color>
+		      <outline>{$this->style['outline']}</outline>
+		      <fill>{$this->style['fill']}</fill>
+		    </PolyStyle>
+		  </Style>
 		<MultiGeometry>
 $polygons
 		</MultiGeometry>
